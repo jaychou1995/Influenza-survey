@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdn.bootcss.com/weui/1.1.3/style/weui.min.css">
+  <link rel="stylesheet" href="https://cdn.bootcss.com/jquery-weui/1.2.1/css/jquery-weui.min.css">
+  <title>广西壮族自治区人民医院邕武医院患者流行病学筛查信息表</title>
+  <style>
+    *{
+      /* touch-action 用于指定某个给定的区域是否允许用户操作，以及如何响应用户操作 */
+      touch-action: pan-y;
+      font-size: 14px;
+    }
+    html,body{
+      width: 100%;
+      height: 100%;
+    }
+    header,nav,main{
+      box-sizing: border-box;
+      padding: 8px;
+    }
+    .container-title{
+      text-align: center;
+    }
+    .tips{
+      color: #666666;
+      padding-top: 10px;
+    }
+    .tips-text{
+      text-indent: 2em;
+    }
+    .question{
+      margin: 20px 0;
+    }
+    .item{
+      margin-bottom: 16px;
+    }
+    .item-radio{
+      width: 100%;
+    }
+    .item-radio input{
+      margin: 0 20px;
+    }
+    .input-style{
+      margin-left: 10px;
+      width: 170px;
+      text-align: center;
+      border-bottom: 1px solid #e6e6e6;
+    }
+    .submit{
+      margin-bottom: 50px;
+    }
+    .e-tip{
+      color: red;
+      text-align: center;
+      margin-bottom: 16px;
+    }
+    .value-input{
+      margin-top: 10px;
+    }
+    .add-value{
+      display: none;
+    }
+    label{
+      margin-right: 20px;
+    }
+  </style>
+</head>
+<body>
+  <header><h2 class="container-title">广西壮族自治区人民医院邕武医院患者流行病学筛查信息表</h2></header>
+  <nav class="tips">
+    <div>尊敬的病友：</div>
+    <div class="tips-text">您好！当前，广西区新冠肺炎疫情防控工作进入关键期，为贯彻落实习近平总书记重要指示精神，更好地维护广大人民群众安全和身体健康，请您在预约就诊前如实填写以下流行病学信息，谢谢您的理解和配合。</div>
+  </nav>
+  <main class="container">
+    <div class="question">
+    </div>
+    <div class="weui_cell_hd submit">
+      <button class="weui-btn weui-btn_primary" id="submit_btn">我填完了</button>
+    </div>
+  </main>
+  <script src="https://cdn.bootcss.com/jquery/1.11.0/jquery.min.js"></script>
+  <script src="https://cdn.bootcss.com/jquery-weui/1.2.1/js/jquery-weui.min.js"></script>
+  <script>
+    const data = [
+      {title: '1.是否有发热症状？', text: "问题1", name: 'q01'},
+      {title: '2.请输入您的体温', text: "问题2", input: true, picker: true, name: 'q02'},
+      {title: '3.发病前14天内曾在武汉市及周边地区旅游或居住？', text: "问题3", name: 'q03', describe: '具体城市或社区名：', describeValue: 'd03', yesid:'yesid03', noid: 'noid03'},
+      {title: '4.发病前14天内曾在其他有病例报告社区旅游或居住？', text: "问题4", name: 'q04', describe: '具体城市或社区名：', describeValue: 'd04', yesid:'yesid04', noid: 'noid04'},
+      {title: '5.发病前14天内曾接触过发热或呼吸道症状并来自吉林省吉林市舒兰市、丰满区、船营区、昌邑区；湖北省武汉市东西湖区及辽宁省沈阳市苏家屯区的患者？', text: "问题5", name: 'q05', describe: '具体城市或社区名：', describeValue: 'd05', yesid:'yesid05', noid: 'noid05'},
+      {title: '6.发病前14天内曾接触过发热或呼吸道症状并来自其他病历报告社区的患者？', text: "问题6", name: 'q06', describe: '具体城市或社区名：', describeValue: 'd06', yesid:'yesid06', noid: 'noid06'},
+      {title: '7.2周内是否在小范围如家庭、办公室、学校班级等场所，出现2例及以上发热和/或呼吸道症状的病例？', text: "问题7", name: 'q07', describe: '有聚集性发病描述：', describeValue: 'd07', yesid:'yesid07', noid: 'noid07'},
+      {title: '8.是否陪护、探视确诊病人；与感染该病毒的医护人员一起工作，或与确诊患者近距离交往？', text: "问题8", name: 'q08', describe: '请详细描述', describeValue: 'd08', yesid:'yesid08', noid: 'noid08'},
+      {title: '9.是否与新冠肺炎患者同一个封闭的环境：同办公室、教室、宿舍电梯密闭狭小的空间？', text: "问题9", name: 'q09', describe: '请详细描述', describeValue: 'd09', yesid:'yesid09', noid: 'noid09'},
+      {title: '10.是否与新冠肺炎患者一起以任何交通出行方式旅行，如同机、同车乘务？', text: "问题10", name: 'q10', describe: '请详细描述', describeValue: 'd10', yesid:'yesid10', noid: 'noid10'},
+      {title: '11.是否与新冠肺炎患者患者一起：如家庭成员、室友？', text: "问题11", name: 'q11', describe: '请详细描述', describeValue: 'd11', yesid:'yesid11', noid: 'noid11'},
+      {title: '12.是否有咳嗽咳痰气喘胸痛胸闷之类的症状？', text: "问题12", name: 'q12'},
+      {title: '13.是否存在其他症状？', text: "问题13", name: 'q13', describe: '请详细描述', describeValue: 'd13', yesid:'yesid13', noid: 'noid13'},
+      {title: '14.陪同家属人数？', text: "问题14", input: true, picker: true, name: 'q14'},
+      {title: '15.陪同家属是否存在发热现象？', text: "问题15", name: 'q15'},
+      {title: '16.家属姓名', text: "问题16", input: true, name: 'q16'},
+      {title: '17.家属关系', text: "问题17", input: true, picker: true, name: 'q17'},
+      {title: '18.家属联系电话', text: "问题18", input: true, name: 'q18'},
+      {title: '19.是否有咳嗽咳痰气喘胸痛胸闷之类的症状？', text: "问题19", name: 'q19'},
+      {title: '20.是否存在其他症状？', text: "问题20", name: 'q20', describe: '请详细描述', describeValue: 'd20', yesid:'yesid20', noid: 'noid20'},
+      {title: '21.家属在发病前14天内是否曾在吉林省吉林市舒兰市、丰满区、船营区、昌邑区；湖北省武汉市东西湖区及辽宁省沈阳市苏家屯区旅游或居住？', text: "问题21", name: 'q21', describe: '具体城市或社区名：', describeValue: 'd21', yesid:'yesid21', noid: 'noid21'},
+      {title: '22.家属在发病前14天内是否曾在其他有病例报告社区旅游或居住？', text: "问题22", name: 'q22', describe: '具体城市或社区名：', describeValue: 'd22', yesid:'yesid22', noid: 'noid22'},
+    ]
+
+    function getData(list){
+      for(let item of list){
+        if(item.input){
+          let list = $(`
+          <div class="item">
+            ${item.title} <input class="weui-input input-style" type="text" id='${item.name}' placeholder="点击此处选择" value="" />
+          </div>
+          `)
+          $(".question").append(list)
+        }else if(item.describe){
+          let list = $(`
+          <div class="item weui_cell_hd weui-cells_checkbox">
+            ${item.title}
+            <div class="item-radio">
+              <label><input type="radio" name="${item.name}" value="1" class="weui-check" id="${item.yesid}" />
+                <i class="weui-icon-checked"></i>
+                是</label>
+              <label><input type="radio" name="${item.name}" value="0" class="weui-check" id="${item.noid}" />
+                <i class="weui-icon-checked"></i>
+                否</label>
+            </div>
+            <div class="add-value">
+              <div class="weui-cells__title value-input">${item.describe}</div>
+              <div class="weui-cells">
+                <div class="weui-cell">
+                  <div class="weui-cell__bd">
+                    <input class="weui-input" id="${item.describeValue}" type="text" placeholder="请在此处输入" value="" />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          `)
+          $(".question").append(list)
+        }else{
+          let list = $(`
+          <div class="item weui_cell_hd weui-cells_checkbox">
+            ${item.title}
+            <div class="item-radio">
+              <label><input type="radio" name="${item.name}" value="1" class="weui-check" />
+                <i class="weui-icon-checked"></i>
+                是</label>
+              <label><input type="radio" name="${item.name}" value="0" class="weui-check" />
+                <i class="weui-icon-checked"></i>
+                否</label>
+            </div>
+          </div>
+          `)
+          $(".question").append(list)
+        }
+      }
+    }
+
+    $(function(){
+      let firstData = data.slice(0,14)
+      getData(firstData)
+      $("#q02").picker({
+        title: "请输入您的体温",
+        cols: [
+          {
+            textAlign: 'center',
+            values: ['36.0℃或更低', '36.1℃', '36.2℃', '36.3℃', '36.4℃', '36.5℃', '36.6℃', '36.7℃', '36.8℃', '36.9℃', '37.0℃', '37.1℃', '37.2℃', '37.3℃或更高']
+          }
+        ]
+      });
+      $("#q14").picker({
+        title: "请输入陪同家属人数",
+        cols: [
+          {
+            textAlign: 'center',
+            values: ['无家属陪同', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '超过10人以上']
+          }
+        ]
+      });
+      $('.question').on('click','#q17',function(){
+        $("#q17").picker({
+          title: "家属关系",
+          cols: [
+            {
+              textAlign: 'center',
+              values: ['父母', '夫妻', '子女', '同学', '师生', '其他']
+            }
+          ]
+        })
+      })
+
+      $("#submit_btn").on('click', ()=>{
+        if($("#q02").val() == ''){
+          $.alert("请填您的体温情况");
+          return
+        }
+        if($("#q14").val() == ''){
+          $.alert("请填写陪同家属人数");
+          return
+        }
+        if($("#q14").val() != '无家属陪同' && $(".item").length <= 14){
+          $.alert("请填写其中一位陪同家属的情况");
+          let title = $(`
+          <div class="e-tip">*请填写其中一位陪同家属的情况</div>
+          `)
+          $(".question").append(title)
+          let add_data = data.slice(14)
+          getData(add_data)
+          return
+        }
+        if($("#q16").val() == ''){
+          $.alert("请填写陪同家属姓名");
+          return
+        }
+        if($("#q18").val() == ''){    
+          $.alert("请填写陪同家属联系电话");
+          return
+        }if($("#q17").val() == ''){
+          $.alert("请填写家属关系");
+          return
+        }
+
+        //提交表单
+        // 'q01-0,q02-0,q03-1-原因'
+        let params = ''
+        let newData = data.slice(0,14)
+        if($(".item").length > 14){
+          newData = data
+        }
+        for(let i=0;i<newData.length;i++){
+          if(!newData[i].input){
+            let val=$(`input:radio[name=${newData[i].name}]:checked`).val()
+            if(val==null){
+              $.alert(`请填写${newData[i].text}`);
+              return
+            }
+            if(val==1){
+              if(newData[i].describe){
+                //加入补充内容
+                let d_data = $(`#${newData[i].describeValue}`).val()
+                params += newData[i].name + '-' + val + '-' + d_data + ','
+              }else{
+                params += newData[i].name + '-' + val + ','
+              }
+              $.alert(`请您先进行居家隔离或前往医院特殊发热门诊进行进一步咨询。一周后需重新填写流调表。`,"温馨提示");
+            }
+            if(val==0){
+              params += newData[i].name + '-' + val + ','
+            }
+          }else if(i == 1){
+            let val = $(`#${newData[i].name}`).val()
+            if(val == '37.3℃或更高'){
+              params += newData[i].name + '-' + 1 + ','
+              $.alert(`请您先进行居家隔离或前往医院特殊发热门诊进行进一步咨询。一周后需重新填写流调表。`,"温馨提示");
+            }else{
+              let val = $(`#${newData[i].name}`).val()
+              params += newData[i].name + '-' + val + ','
+            }
+          }
+          else{
+            let val = $(`#${newData[i].name}`).val()
+            params += newData[i].name + '-' + val + ','
+          }
+        }
+
+        params = params.substring(0, params.length-1)
+        //提交params
+        console.log(params);
+        
+      })
+
+      for(let item of data){
+        if(item.describe){
+          if( $(`#${item.yesid}`).length){
+            $(`#${item.yesid}`).on('click',function(){
+              $(this).parents('.item-radio').siblings('.add-value').css("display","block")
+            })
+            $(`#${item.noid}`).on('click',function(){
+              $(this).parents('.item-radio').siblings('.add-value').css("display","none")
+            })
+          }else{
+            $('.question').on('click', `#${item.yesid}`, ()=>{
+              $(`#${item.yesid}`).parents('.item-radio').siblings('.add-value').css("display","block")
+            })
+            $('.question').on('click', `#${item.noid}`, ()=>{
+              $(`#${item.noid}`).parents('.item-radio').siblings('.add-value').css("display","none")
+            })
+          }
+        }
+      }
+
+    })
+  </script>
+</body>
+</html>
