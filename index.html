@@ -62,6 +62,9 @@
         .add-value{
             display: none;
         }
+        .family{
+            display: none;
+        }
         label{
             margin-right: 20px;
         }
@@ -75,6 +78,9 @@
 </nav>
 <main class="container">
     <div class="question">
+    </div>
+    <div class="family">
+        
     </div>
     <div class="weui_cell_hd submit">
         <button class="weui-btn weui-btn_primary" id="submit_btn">我填完了</button>
@@ -108,7 +114,7 @@
         {title: '22.家属在发病前14天内是否曾在其他有病例报告社区旅游或居住？', text: "问题22", name: 'q22', describe: '具体城市或社区名：', describeValue: 'd22', yesid:'yesid22', noid: 'noid22'},
     ]
 
-    function getData(list){
+    function getData(list, className){
         for(let item of list){
             if(item.input){
                 let list = $(`
@@ -116,7 +122,7 @@
             ${item.title} <input class="weui-input input-style" type="text" id='${item.name}' placeholder="点击此处选择" value="" />
           </div>
           `)
-                $(".question").append(list)
+                $(className).append(list)
             }else if(item.describe){
                 let list = $(`
           <div class="item weui_cell_hd weui-cells_checkbox">
@@ -141,7 +147,7 @@
             </div>
           </div>
           `)
-                $(".question").append(list)
+                $(className).append(list)
             }else{
                 let list = $(`
           <div class="item weui_cell_hd weui-cells_checkbox">
@@ -156,14 +162,21 @@
             </div>
           </div>
           `)
-                $(".question").append(list)
+                $(className).append(list)
             }
         }
     }
 
     $(function(){
         let firstData = data.slice(0,14)
-        getData(firstData)
+        let addData = data.slice(14)
+        getData(firstData, ".question")
+        let title = $(`
+          <div class="e-tip">*请填写其中一位陪同家属的情况</div>
+          `)
+        $(".family").append(title)
+        getData(addData, '.family')
+
         $("#q02").picker({
             title: "请输入您的体温",
             cols: [
@@ -182,45 +195,39 @@
                 }
             ]
         });
-        $('.question').on('click','#q17',function(){
-            $("#q17").picker({
-                title: "家属关系",
-                cols: [
-                    {
-                        textAlign: 'center',
-                        values: ['父母', '夫妻', '子女', '同学', '师生', '其他']
-                    }
-                ]
-            })
+        $("#q17").picker({
+            title: "家属关系",
+            cols: [
+                {
+                    textAlign: 'center',
+                    values: ['父母', '夫妻', '子女', '同学', '师生', '其他']
+                }
+            ]
         })
 
+
         $("#submit_btn").on('click', ()=>{
-            if($("#q02").val() == ''){
+            if($("#q02").val() === ''){
             $.alert("请填您的体温情况");
             return
         }
-        if($("#q14").val() == ''){
+        if($("#q14").val() === ''){
             $.alert("请填写陪同家属人数");
             return
         }
-        if($("#q14").val() != '无家属陪同' && $(".item").length <= 14){
+        if($("#q14").val() != '无家属陪同' && $('.family').css("display") === 'none'){
             $.alert("请填写其中一位陪同家属的情况");
-            let title = $(`
-          <div class="e-tip">*请填写其中一位陪同家属的情况</div>
-          `)
-            $(".question").append(title)
-            let add_data = data.slice(14)
-            getData(add_data)
+            $('.family').css("display","block")
             return
         }
-        if($("#q16").val() == ''){
+        if($("#q16").val() === '' && $('.family').css("display") === 'block'){
             $.alert("请填写陪同家属姓名");
             return
         }
-        if($("#q18").val() == ''){
+        if($("#q18").val() === '' && $('.family').css("display") === 'block'){
             $.alert("请填写陪同家属联系电话");
             return
-        }if($("#q17").val() == ''){
+        }if($("#q17").val() === '' && $('.family').css("display") === 'block'){
             $.alert("请填写家属关系");
             return
         }
@@ -229,17 +236,19 @@
         // 'q01-0,q02-0,q03-1-原因'
         let params = ''
         let newData = data.slice(0,14)
-        if($(".item").length > 14){
+        if($('.family').css("display") === 'block'){
             newData = data
         }
+        console.log(newData);
+        
         for(let i=0;i<newData.length;i++){
             if(!newData[i].input){
                 let val=$(`input:radio[name=${newData[i].name}]:checked`).val()
-                if(val==null){
+                if(val == null){
                     $.alert(`请填写${newData[i].text}`);
                     return
                 }
-                if(val==1){
+                if(val == 1){
                     if(newData[i].describe){
                         //加入补充内容
                         let d_data = $(`#${newData[i].describeValue}`).val()
@@ -249,7 +258,7 @@
                     }
                     $.alert(`请您先进行居家隔离或前往医院特殊发热门诊进行进一步咨询。一周后需重新填写流调表。`,"温馨提示");
                 }
-                if(val==0){
+                if(val == 0){
                     params += newData[i].name + '-' + val + ','
                 }
             }else if(i == 1){
@@ -278,11 +287,11 @@
             dataType:'json',
             data:'data='+params,
             success:function(data){
-                if(data==null || data==''){
+                if(data===null || data===''){
                     alert('请求失败');
                 }else if(parseInt(data.error)){
                     alert(data.msg);
-                  /*  if(data.error==2){
+                  /*  if(data.error===2){
                         location.href = './registrationInfo?date=<{$doc_info.0.GZRQ}>&YYXH='+data.YYXH;
                     }*/
                 }else {
